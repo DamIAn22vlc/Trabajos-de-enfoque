@@ -1,0 +1,47 @@
+[
+    {
+        "categoria": "WiFi y Conectividad",
+        "preguntas": [
+            {
+                "id": 1,
+                "pregunta": "¿Cómo puedo mejorar la señal de mi red WiFi?",
+                "respuesta": "Para mejorar la señal, sitúa el router en un lugar elevado y despejado, lejos de paredes u objetos metálicos. También puedes cambiar el canal de emisión o utilizar repetidores/sistemas Mesh si la vivienda es grande."
+            },
+            {
+                "id": 2,
+                "pregunta": "¿Qué debo hacer si mi red WiFi está lenta?",
+                "respuesta": "Primero, realiza un test de velocidad. Si es baja, reinicia el router (espera 30 segundos antes de encenderlo). Comprueba que no haya demasiados dispositivos conectados o aplicaciones de alto consumo como streaming o descargas en curso."
+            }
+        ]
+    },
+    {
+        "categoria": "Seguridad",
+        "preguntas": [
+            {
+                "id": 3,
+                "pregunta": "¿Cómo puedo proteger mi red WiFi contra intrusiones?",
+                "respuesta": "Asegúrate de tener configurado el cifrado WPA2 o WPA3. Cambia la contraseña por defecto del router y desactiva el WPS. También es recomendable ocultar el nombre de la red (SSID) o filtrar por direcciones MAC."
+            },
+            {
+                "id": 4,
+                "pregunta": "¿Qué debo hacer si olvidé la contraseña de mi red WiFi?",
+                "respuesta": "Si no la has cambiado, suele estar en una etiqueta debajo del router. Si la cambiaste y no la recuerdas, deberás resetear el router a valores de fábrica manteniendo pulsado el botón 'Reset' durante 10 segundos."
+            }
+        ]
+    },
+    {
+        "categoria": "Fibra y Telefonía",
+        "preguntas": [
+            {
+                "id": 5,
+                "pregunta": "¿Qué ventajas ofrece la fibra óptica sobre otros tipos de conexión?",
+                "respuesta": "La fibra óptica ofrece mayor velocidad, estabilidad frente a interferencias electromagnéticas y simetría (misma velocidad de subida que de bajada), lo que mejora la experiencia en videollamadas y juegos online."
+            },
+            {
+                "id": 6,
+                "pregunta": "¿Puedo conservar mi número de teléfono móvil actual al cambiar de proveedor?",
+                "respuesta": "Sí, mediante el proceso de portabilidad puedes mantener tu número actual. Solo necesitas solicitar el cambio al nuevo proveedor y ellos gestionarán el traspaso sin que pierdas tu línea."
+            }
+        ]
+    }
+]
