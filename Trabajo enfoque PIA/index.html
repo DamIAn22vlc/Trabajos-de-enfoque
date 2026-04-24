@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastRetail AI - Clasificador</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex flex-col items-center py-12">
+
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl">
+        <h1 class="text-3xl font-bold text-blue-600 mb-2 text-center">FastRetail AI</h1>
+        <p class="text-gray-500 mb-8 text-center">Sistema de Clasificación Automática de Productos</p>
+
+        <div class="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center mb-6" id="dropzone">
+            <input type="file" id="fileInput" class="hidden">
+            <button onclick="document.getElementById('fileInput').click()"
+                class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md transition">
+                Seleccionar Imagen del Producto
+            </button>
+            <p id="fileName" class="mt-4 text-sm text-gray-600 italic"></p>
+        </div>
+
+        <button onclick="uploadImage()" id="btnAnalyze"
+            class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-md hidden shadow-md transition">
+            Analizar con Amazon Rekognition
+        </button>
+
+        <div id="results" class="mt-8 hidden">
+            <h2 class="text-xl font-semibold mb-4 border-b pb-2">Etiquetas Detectadas:</h2>
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="text-gray-400 text-sm">
+                        <th class="py-2">Categoría / Etiqueta</th>
+                        <th class="py-2">Confianza (IA)</th>
+                    </tr>
+                </thead>
+                <tbody id="labelsBody" class="divide-y divide-gray-100">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const btnAnalyze = document.getElementById('btnAnalyze');
+        const fileNameDisp = document.getElementById('fileName');
+
+        // Verificar que el servidor está disponible al cargar
+        async function checkServer() {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/health');
+                const data = await response.json();
+                console.log("✓ Servidor disponible:", data);
+                if (!data.aws_configured) {
+                    alert("⚠️ Advertencia: Las credenciales de AWS no están configuradas correctamente.\nVerifica las variables de entorno.");
+                }
+            } catch (error) {
+                alert("❌ Error: No se puede conectar al servidor en http://127.0.0.1:8000\n\nAsegúrate de ejecutar: python main.py");
+                console.error("Error al conectar:", error);
+            }
+        }
+
+        // Verificar servidor al cargar la página
+        window.addEventListener('load', checkServer);
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                fileNameDisp.innerText = `Archivo seleccionado: ${fileInput.files[0].name}`;
+                btnAnalyze.classList.remove('hidden');
+            }
+        });
+
+        async function uploadImage() {
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("Por favor selecciona una imagen");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            btnAnalyze.innerText = "Analizando...";
+            btnAnalyze.disabled = true;
+
+            try {
+                console.log("📤 Enviando imagen al servidor...");
+                const response = await fetch('http://127.0.0.1:8000/upload-and-analyze/', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.error) {
+                    alert(`❌ Error del servidor: ${data.error}`);
+                    console.error("Error:", data.error);
+                    btnAnalyze.innerText = "Analizar con Amazon Rekognition";
+                    btnAnalyze.disabled = false;
+                    return;
+                }
+
+                console.log("✓ Análisis completado:", data);
+                displayResults(data.analisis);
+
+            } catch (error) {
+                console.error("Error detallado:", error);
+                alert(`❌ Error al conectar con el servidor:\n${error.message}\n\nAsegúrate de que FastAPI está ejecutándose (python main.py)`);
+                btnAnalyze.innerText = "Analizar con Amazon Rekognition";
+                btnAnalyze.disabled = false;
+            }
+        }
+
+        function displayResults(labels) {
+            const body = document.getElementById('labelsBody');
+            const resultsDiv = document.getElementById('results');
+            body.innerHTML = "";
+
+            labels.forEach(label => {
+                const row = `<tr class="hover:bg-blue-50">
+                    <td class="py-3 font-medium text-gray-700">${label.nombre}</td>
+                    <td class="py-3 text-blue-600 font-bold">${label.confianza}</td>
+                </tr>`;
+                body.innerHTML += row;
+            });
+
+            resultsDiv.classList.remove('hidden');
+            btnAnalyze.innerText = "Análisis Completado";
+        }
+    </script>
+</body>
+
+</html>
