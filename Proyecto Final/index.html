@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🩺 Sistema de Gestión de Diabetes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+
+        button:hover {
+            transform: scale(1.02);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .result {
+            background: #f8f9ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .result p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .success {
+            color: #22c55e;
+            font-weight: bold;
+        }
+
+        .warning {
+            color: #f97316;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #ef4444;
+            font-weight: bold;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .info-item {
+            background: #f3f4f6;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 0.8em;
+            color: #999;
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-size: 1.5em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+        }
+
+        .status {
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        .status.loading {
+            background: #fef3c7;
+            color: #92400e;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🩺 Gestor de Diabetes IA</h1>
+            <p>Sistema de recomendación de insulina basado en Red Neuronal</p>
+        </header>
+
+        <div class="grid">
+            <!-- Predicción de Dosis -->
+            <div class="card">
+                <h2>📊 Calcular Dosis</h2>
+                <form id="predictForm">
+                    <div class="form-group">
+                        <label for="glucosa">Glucosa (mg/dL)</label>
+                        <input type="number" id="glucosa" min="40" max="400" value="154" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="carbs">Carbohidratos (g)</label>
+                        <input type="number" id="carbs" min="0" max="200" value="50" required>
+                    </div>
+                    <button type="submit">Calcular Dosis 🚀</button>
+                    <div id="predictResult" class="result"></div>
+                </form>
+            </div>
+
+            <!-- Chatbot -->
+            <div class="card">
+                <h2>🤖 Chatbot IA</h2>
+                <form id="chatbotForm">
+                    <div class="form-group">
+                        <label for="mensaje">Mensaje</label>
+                        <textarea id="mensaje" rows="4" placeholder="Ej: Tengo 154 mg/dL y voy a comer 50g de pasta"
+                            required></textarea>
+                    </div>
+                    <button type="submit">Enviar Mensaje 💬</button>
+                    <div id="chatbotResult" class="result"></div>
+                </form>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Informe Clínico -->
+            <div class="card">
+                <h2>📈 Informe Clínico</h2>
+                <button onclick="obtenerInforme()">Generar Informe 📋</button>
+                <div id="reportResult" class="result"></div>
+            </div>
+
+            <!-- Tendencias -->
+            <div class="card">
+                <h2>⚠️ Verificar Tendencias</h2>
+                <button onclick="verificarTendencias()">Revisar Tendencias 🔍</button>
+                <div id="trendsResult" class="result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000';
+
+        // Predicción de Dosis
+        document.getElementById('predictForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resultDiv = document.getElementById('predictResult');
+            resultDiv.className = 'result show status loading';
+            resultDiv.innerHTML = '⏳ Calculando...';
+
+            try {
+                const response = await fetch(`${API_BASE}/predict`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        glucosa: parseFloat(document.getElementById('glucosa').value),
+                        carbs: parseFloat(document.getElementById('carbs').value)
+                    })
+                });
+
+                const data = await response.json();
+                resultDiv.className = 'result show';
+
+                if (data.status === 'success') {
+                    resultDiv.innerHTML = `
+                        <h3 class="success">✅ Dosis Calculada</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Glucosa</div>
+                                <div class="info-value">${data.glucosa}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Carbs</div>
+                                <div class="info-value">${data.carbs}g</div>
+                            </div>
+                        </div>
+                        <p style="margin-top: 15px; font-size: 1.3em;"><strong>💉 Dosis: ${data.dosis_recomendada} U</strong></p>
+                        <p style="margin-top: 10px; font-size: 0.9em;">${data.mensaje}</p>
+                        ${data.advertencia ? `<p class="warning" style="margin-top: 10px;">${data.advertencia}</p>` : ''}
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<p class="error">❌ ${data.error}</p>`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result show';
+                resultDiv.innerHTML = `<p class="error">❌ Error de conexión: ${error.message}</p>`;
+            }
+        });
+
+        // Chatbot
+        document.getElementById('chatbotForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resultDiv = document.getElementById('chatbotResult');
+            resultDiv.className = 'result show status loading';
+            resultDiv.innerHTML = '⏳ Procesando...';
+
+            try {
+                const response = await fetch(`${API_BASE}/chatbot`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mensaje: document.getElementById('mensaje').value
+                    })
+                });
+
+                const data = await response.json();
+                resultDiv.className = 'result show';
+                resultDiv.innerHTML = `<h3>🤖 Respuesta</h3><p>${data.respuesta}</p>`;
+            } catch (error) {
+                resultDiv.className = 'result show';
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+        });
+
+        // Informe Clínico
+        async function obtenerInforme() {
+            const resultDiv = document.getElementById('reportResult');
+            resultDiv.className = 'result show status loading';
+            resultDiv.innerHTML = '⏳ Generando informe...';
+
+            try {
+                const response = await fetch(`${API_BASE}/report`);
+                const data = await response.json();
+                resultDiv.className = 'result show';
+
+                if (data.status === 'success') {
+                    const informe = data.informe;
+                    resultDiv.innerHTML = `
+                        <h3 class="success">✅ Informe Clínico</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Total Consultas</div>
+                                <div class="info-value">${informe['Total de mediciones']}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Glucosa Promedio</div>
+                                <div class="info-value">${informe['Promedio de glucosa']}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Max Carbs</div>
+                                <div class="info-value">${informe['Bolo más grande de comida (g)']}g</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Total Insulina</div>
+                                <div class="info-value">${informe['Insulina total inyectada (U)']}U</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.className = 'result show';
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        // Tendencias
+        async function verificarTendencias() {
+            const resultDiv = document.getElementById('trendsResult');
+            resultDiv.className = 'result show status loading';
+            resultDiv.innerHTML = '⏳ Analizando tendencias...';
+
+            try {
+                const response = await fetch(`${API_BASE}/trends`);
+                const data = await response.json();
+                resultDiv.className = 'result show';
+
+                const mensaje = data.tendencia || data.mensaje;
+                let htmlClass = 'success';
+                if (mensaje.includes('ALERTA') || mensaje.includes('AVISO')) {
+                    htmlClass = 'warning';
+                }
+
+                resultDiv.innerHTML = `<h3 class="${htmlClass}">📊 Análisis</h3><p>${mensaje}</p>`;
+            } catch (error) {
+                resultDiv.className = 'result show';
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+
+</html>
